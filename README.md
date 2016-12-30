@@ -127,7 +127,7 @@ on the domain events icon and the profile screen containing the map will be disp
 
 Toolbar Info:
 
-![Toolbar](https://raw.githubusercontent.com/AshleyDawson/DomainEventDispatcherBundle/master/src/Resources/docs/img/domain-event-dispatcher-toolbar.jpg)
+![Toolbar](https://raw.githubusercontent.com/AshleyDawson/DomainEventDispatcherBundle/master/src/Resources/docs/img/domain-event-dispatcher-toolbar-info.jpg)
 
 Full Profiler Screen:
 
