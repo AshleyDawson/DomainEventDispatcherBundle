@@ -14,7 +14,7 @@ Install the bundle via [Composer](https://getcomposer.org/):
 $ composer require ashleydawson/domain-event-dispatcher-bundle
 ```
 
-Then, register the bundle with the Symfony kernel:
+Then, register the bundle with the Symfony kernel `app/AppKernel.php`:
 
 ```php
 $bundles = [
