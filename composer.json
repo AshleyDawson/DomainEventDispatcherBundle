@@ -1,0 +1,33 @@
+{
+  "name": "ashleydawson/domain-event-dispatcher-bundle",
+  "type": "symfony-bundle",
+  "description": "Symfony bundle to add the domain event dispatcher (singleton)",
+  "license": "MIT",
+  "keywords": [
+    "ddd",
+    "domain",
+    "event",
+    "dispatcher",
+    "listener",
+    "subscriber",
+    "symfony",
+    "bundle"
+  ],
+  "authors": [
+    {
+      "name": "Ashley Dawson",
+      "email": "ashley@ashleydawson.co.uk"
+    }
+  ],
+  "require": {
+    "php": ">=5.5",
+    "symfony/symfony": "^2.3|^3.0",
+    "ashleydawson/domain-event-dispatcher": "^1.0.6"
+  },
+  "autoload": {
+    "psr-4": { "AshleyDawson\\DomainEventDispatcherBundle\\": "src" }
+  },
+  "config": {
+    "bin-dir": "bin"
+  }
+}

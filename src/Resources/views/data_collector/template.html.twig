@@ -1,0 +1,147 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% import _self as helper %}
+
+{% block toolbar %}
+    {% set icon %}
+        <span class="icon">{{ include('@AshleyDawsonDomainEventDispatcher/data_collector/icon.svg') }}</span>
+        <span class="sf-toolbar-value">{{ collector.immediate + collector.deferred }}</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Domain Event Dispatcher</b>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Events</b>
+            <span class="sf-toolbar-status">{{ collector.numberOfImmediateEvents + collector.numberOfDeferredEvents }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Listeners for Deferred</b>
+            <span class="sf-toolbar-status">{{ collector.deferred }}</span>
+            <span class="sf-toolbar-status">{{ collector.deferredElapsedTime / 1000 | round(4) }}<span class="unit">ms</span></span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Listeners for Immediate</b>
+            <span class="sf-toolbar-status">{{ collector.immediate }}</span>
+            <span class="sf-toolbar-status">{{ collector.immediateElapsedTime / 1000 | round(4) }}<span class="unit">ms</span></span>
+        </div>
+    {% endset %}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon" style="padding-top: 2px;">{{ include('@AshleyDawsonDomainEventDispatcher/data_collector/icon.svg') }}</span>
+        <strong>Domain Events</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>
+        Domain Event Dispatcher
+        <a href="https://github.com/AshleyDawson/DomainEventDispatcher/blob/master/README.md" target="_blank" style="font-size:14px;float: right;margin-top: 10px;">Help &amp; Documentation</a>
+    </h2>
+    {% if collector.invocationMap is empty %}
+        <div class="empty">
+            <p>No domain events have been recorded.</p>
+        </div>
+    {% else %}
+        <div class="sf-tabs">
+            <div class="tab">
+                <h3 class="tab-title">
+                    Deferred Events <span class="badge">{{ collector.numberOfDeferredEvents }}</span>
+                </h3>
+                <div class="tab-content">
+                    {{ helper.render_table(collector.invocationMap, 'deferred') }}
+                    <h3>
+                        Deferred Invocation Config.
+                    </h3>
+                    <p style="color:#999;">
+                        Deferred events will be invoked by the following kernel event
+                    </p>
+                    <div class="metrics">
+                        <div class="metric">
+                            <span class="value">{{ collector.deferredEventName }}</span>
+                            <span class="label">Kernel Event</span>
+                        </div>
+                        <div class="metric">
+                            <span class="value">{{ collector.deferredEventPriority }}</span>
+                            <span class="label">Kernel Event Priority</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab">
+                <h3 class="tab-title">
+                    Immediate Events <span class="badge">{{ collector.numberOfImmediateEvents }}</span>
+                </h3>
+                <div class="tab-content">
+                    {{ helper.render_table(collector.invocationMap, 'immediate') }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% macro render_table(map, disposition) %}
+    {% if map[disposition] is defined %}
+        <style type="text/css">
+            .event-instance.contracted {
+                display: none;
+            }
+            .event-instance.undefined {
+                display: table-row !important;
+            }
+        </style>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Events/Listeners</th>
+                    <th width="75" style="text-align: center;">Type</th>
+                    <th width="110" style="text-align: right;">Elapsed Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event, set in map[disposition].events %}
+                    {% set eventRowId = (event | replace({'\\': ''})) %}
+                    <tr>
+                        <th colspan="4" class="colored font-normal" title="Event" style="cursor: pointer;" onclick="Sfjs.toggleClass(document.getElementById('{{ eventRowId }}', 'expanded'))">
+                            {{ include('@AshleyDawsonDomainEventDispatcher/data_collector/icon_small.svg') }}&nbsp;
+                            {{ event }}&nbsp;
+                            {% if set.is_disposable %}
+                                <span style="background: #eceecd;display: inline-block;padding: 0 3px;border-radius: 2px;font-size: 0.8em;color: #a6a185;margin: 0 0 0 2px;font-weight: normal;">Disposable</span>
+                            {% endif %}
+                            <span style="float: right;color: #999;">&hellip;</span>
+                        </th>
+                    </tr>
+                    <tr id="{{ eventRowId }}" class="event-instance contracted">
+                        <td colspan="4" style="background: #f3f3f3;">
+                            <div style="background: #fff;padding: 10px;border-radius: 2px;">
+                                {{ dump(set.event_instance) }}
+                            </div>
+                        </td>
+                    </tr>
+                    {% for listener in set.listeners %}
+                        <tr>
+                            <td width="10" style="padding-right: 0;padding-left: 30px; padding-top: 7px; color: #4F805D;font-weight: bold; font-size: 1.1em;" title="Invoked Listener">&rightarrow;</td>
+                            <td>
+                                {{ listener.class }}
+                            </td>
+                            <td class="font-normal" align="center">
+                                <span style="display: inline-block;padding: 1px 5px; background: #eee;border-radius: 2px; color: #999;font-size: 0.9em;font-weight: bold;">
+                                    {{ listener.is_typed ? 'Typed' : 'General' }}
+                                </span>
+                            </td>
+                            <td class="font-normal" align="right">{{ listener.execution_time_microseconds / 1000 | round(4) }}<span class="unit">ms</span></td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>No <span style="display: inline-block;background: #a7a7a7;padding: 0 4px; border-radius: 2px; color: #fff;">{{ disposition }}</span> events dispatched&hellip;</p>
+        </div>
+    {% endif %}
+{% endmacro %}
