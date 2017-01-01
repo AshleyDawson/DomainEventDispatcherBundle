@@ -103,12 +103,12 @@
                 </tr>
             </thead>
             <tbody>
-                {% for event, set in map[disposition].events %}
-                    {% set eventRowId = (event | replace({'\\': ''})) %}
+                {% for i, set in map[disposition].events %}
+                    {% set eventRowId = ('event_' ~ i) %}
                     <tr>
                         <th colspan="4" class="colored font-normal" title="Event" style="cursor: pointer;" onclick="Sfjs.toggleClass(document.getElementById('{{ eventRowId }}', 'expanded'))">
                             {{ include('@AshleyDawsonDomainEventDispatcher/data_collector/icon_small.svg') }}&nbsp;
-                            {{ event }}&nbsp;
+                            {{ set.event_class }}&nbsp;
                             {% if set.is_disposable %}
                                 <span style="background: #eceecd;display: inline-block;padding: 0 3px;border-radius: 2px;font-size: 0.8em;color: #a6a185;margin: 0 0 0 2px;font-weight: normal;">Disposable</span>
                             {% endif %}

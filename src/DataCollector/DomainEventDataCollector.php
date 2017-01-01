@@ -72,7 +72,7 @@ class DomainEventDataCollector extends DataCollector implements LateDataCollecto
             ->domainEventDispatcher
             ->getEventInvocationMap();
 
-        foreach ($invocationMap->getSets() as $set) {
+        foreach ($invocationMap->getSets() as $i => $set) {
             if (EventInvocationMapEventListenerSet::DISPOSITION_IMMEDIATE == $set->getDisposition()) {
                 $this->data['immediate'] += count($set->getListeners());
                 $this->data['immediate_elapsed_time'] += array_reduce($set->getListeners(), function ($carry, EventInvocationMapEventListener $l) {
@@ -91,9 +91,10 @@ class DomainEventDataCollector extends DataCollector implements LateDataCollecto
                 $this->data['deferred_events'] ++;
             }
 
-            $this->data['invocation_map'][$set->getDisposition()]['events'][get_class($set->getEvent())]['event_instance'] = $set->getEvent();
-            $this->data['invocation_map'][$set->getDisposition()]['events'][get_class($set->getEvent())]['is_disposable'] = ($set->getEvent() instanceof DisposableEventInterface);
-            $this->data['invocation_map'][$set->getDisposition()]['events'][get_class($set->getEvent())]['listeners'] = array_map(function (EventInvocationMapEventListener $listener) {
+            $this->data['invocation_map'][$set->getDisposition()]['events'][$i]['event_class'] = get_class($set->getEvent());
+            $this->data['invocation_map'][$set->getDisposition()]['events'][$i]['event_instance'] = $set->getEvent();
+            $this->data['invocation_map'][$set->getDisposition()]['events'][$i]['is_disposable'] = ($set->getEvent() instanceof DisposableEventInterface);
+            $this->data['invocation_map'][$set->getDisposition()]['events'][$i]['listeners'] = array_map(function (EventInvocationMapEventListener $listener) {
                 return [
                     'class' => get_class($listener->getListener()),
                     'execution_time_microseconds' => $listener->getExecutionTimeInMicroseconds(),
