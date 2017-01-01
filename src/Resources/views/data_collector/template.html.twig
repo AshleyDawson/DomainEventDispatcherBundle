@@ -5,7 +5,7 @@
 {% block toolbar %}
     {% set icon %}
         <span class="icon">{{ include('@AshleyDawsonDomainEventDispatcher/data_collector/icon.svg') }}</span>
-        <span class="sf-toolbar-value">{{ collector.immediate + collector.deferred }}</span>
+        <span class="sf-toolbar-value">{{ collector.numberOfImmediateEvents + collector.numberOfDeferredEvents }}</span>
     {% endset %}
 
     {% set text %}
